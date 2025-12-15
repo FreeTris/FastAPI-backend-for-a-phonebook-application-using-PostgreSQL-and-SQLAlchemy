@@ -1,21 +1,21 @@
 # Phonebook Backend (FastAPI)
 
-A simple backend service built with **FastAPI**, **SQLAlchemy**, and **PostgreSQL**.
+A simple backend service built with FastAPI, SQLAlchemy, and PostgreSQL.
 
-## Tech Stack
+## Used Tech Stack
 - FastAPI
 - SQLAlchemy ORM
 - PostgreSQL
 - psycopg (Postgres driver)
 - Uvicorn
 
-## Features
+## Features implemented in the Project
 - Health check endpoint
 - Create users
 - SQLAlchemy models & schemas
 - Dependency-injected DB sessions
 
-## Setup (Local)
+## Local Setup
 ```bash
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
