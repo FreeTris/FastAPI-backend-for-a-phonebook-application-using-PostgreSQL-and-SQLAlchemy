@@ -2,22 +2,30 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
-# Use environment variable 
-DATABASE_URL = os.getenv("DATABASE_URL")
+# Get the raw URL from Railway (it's postgres://...)
+raw_database_url = os.getenv("DATABASE_URL")
 
-# Don't create engine here!
+if raw_database_url is None:
+    raise ValueError("DATABASE_URL environment variable not set!")
+
+# Railway gives postgres://... but SQLAlchemy needs postgresql://... for psycopg
+# This fixes it automatically
+if raw_database_url.startswith("postgres://"):
+    DATABASE_URL = raw_database_url.replace("postgres://", "postgresql+psycopg://", 1)
+else:
+    DATABASE_URL = raw_database_url  # fallback, in case it's already correct
+
 engine = None
 SessionLocal = None
 Base = declarative_base()
 
 def init_db():
-    """Initialize the engine only when needed (lazy)."""
     global engine, SessionLocal
     if engine is None:
         engine = create_engine(
             DATABASE_URL,
-            pool_pre_ping=True,              # Helps to detect broken connections
-            connect_args={"connect_timeout": 10}  # Wait longer for database to be ready
+            pool_pre_ping=True,
+            connect_args={"connect_timeout": 10},  # ← Comma here!
         )
         SessionLocal = sessionmaker(
             autocommit=False,
@@ -26,7 +34,7 @@ def init_db():
         )
 
 def get_db():
-    init_db()  # This ensures engine is created only on first request
+    init_db()
     db = SessionLocal()
     try:
         yield db
